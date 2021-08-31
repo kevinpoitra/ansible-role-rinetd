@@ -1,0 +1,5 @@
+---
+rinetd_install_source: 'github_releases'
+
+rinetd_default_ipv4_bindaddress: "{{ ansible_default_ipv4.address is defined | ternary(ansible_default_ipv4.address, '') }}"
+rinetd_default_ipv6_bindaddress: "{{ ansible_default_ipv6.address is defined | ternary(ansible_default_ipv6.address, '') }}"

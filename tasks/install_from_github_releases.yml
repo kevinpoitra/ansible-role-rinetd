@@ -1,0 +1,23 @@
+---
+- name: Fetch latest release data from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/samhocevar/rinetd/releases/latest
+  register: gh_json_response
+
+- name: Extract download URL from JSON
+  ansible.builtin.set_fact:
+    archive_download_url: >
+      {{ gh_json_response.json | community.general.json_query("assets[?ends_with(name, '.tar.gz')].browser_download_url") | first }}
+
+- name: Create a temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: rinetd-
+  register: tempfile
+
+- name: Download and extract release tarball
+  ansible.builtin.unarchive:
+    src: "{{ archive_download_url }}"
+    dest: "{{ tempfile.path }}"
+    remote_src: yes
+

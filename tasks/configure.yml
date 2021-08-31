@@ -1,0 +1,9 @@
+---
+- name: Generate rinetd configuration from template
+  ansible.builtin.template:
+    src: rinetd.conf.j2
+    dest: /etc/rinetd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart rinetd

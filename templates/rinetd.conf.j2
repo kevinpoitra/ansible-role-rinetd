@@ -1,0 +1,80 @@
+#
+# this is the configuration file for rinetd, the internet redirection server
+#
+# you may specify global allow and deny rules here
+# only ip addresses are matched, hostnames cannot be specified here
+# the wildcards you may use are * and ?
+#
+# allow 192.168.2.*
+# deny 192.168.2.1?
+# allow fe80:*
+# deny 2001:618:*:e43f
+
+{% if rinetd_allowed_hosts is defined %}
+    {%- for group in rinetd_allowed_hosts %}
+        {%- if group.comment is defined %}
+            {{- '# ' }}{{ group.comment }}{{ '\n' }}
+        {%- endif %}
+
+        {%- for host in group.hosts %}
+            {{- 'allow ' }}{{ host }}{{ '\n' }}
+        {%- endfor %}
+        {{- '\n' }}
+    {%- endfor %}
+{% endif %}
+{% if rinetd_denied_hosts is defined %}
+    {%- for group in rinetd_denied_hosts %}
+        {%- if group.comment is defined %}
+            {{- '# ' }}{{ group.comment }}{{ '\n' }}
+        {%- endif %}
+
+        {%- for host in group.hosts %}
+            {{- 'deny ' }}{{ host }}{{ '\n' }}
+        {%- endfor %}
+        {{- '\n' }}
+    {%- endfor %}
+{% endif %}
+
+#
+# forwarding rules come here
+#
+# you may specify allow and deny rules after a specific forwarding rule
+# to apply to only that forwarding rule
+#
+# bindadress  bindport  connectaddress  connectport  options...
+# 0.0.0.0     80        192.168.1.2     80
+# ::1         80        192.168.1.2     80
+# 0.0.0.0     80        fe80::1         80
+# 127.0.0.1   4000      127.0.0.1       3000
+# 127.0.0.1   4000/udp  127.0.0.1       22           [timeout=1200]
+# 127.0.0.1   8000/udp  192.168.1.2     8000/udp     [src=192.168.1.2,timeout=1200]
+
+{% for rule in rinetd_forwarding_rules %}
+    {%- if rule.comment is defined %}
+        {{- '# ' }}{{ rule.comment }}{{ '\n' }}
+    {%- endif %}
+    {%- for port in rule.ports -%}
+        {{- {
+            'rule': rule,
+            'port': port,
+            'default_ipv4': rinetd_default_ipv4_bindaddress,
+            'default_ipv6': rinetd_default_ipv6_bindaddress
+            } | rinetd_format_rule }}
+        {{- '\n' }}
+    {%- endfor %}
+
+{% endfor %}
+
+# logging information
+{% if rinetd_logging.enabled is defined and rinetd_logging.enabled %}
+logfile {{ rinetd_logging.logfile | default('/var/log/rinetd.log') }}
+{% else %}
+#logfile /var/log/rinetd.log
+{% endif %}
+
+# uncomment the following line if you want web-server style logfile format
+{% if rinetd_logging.logcommon is defined and rinetd_logging.logcommon %}
+logcommon
+{% else %}
+#logcommon
+{% endif %}

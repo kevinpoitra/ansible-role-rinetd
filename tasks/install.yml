@@ -1,0 +1,13 @@
+---
+- name: Check for valid installation source
+  ansible.builtin.fail:
+    msg: No valid rinetd installation source found! rinetd_install_source must be set to either ''repo'' or ''github_releases''.
+  when: rinetd_install_source != 'repo' and rinetd_install_source != 'github_releases'
+
+- name: Install rinetd from apt repository
+  when: rinetd_install_source == 'repo'
+  include_tasks: install_from_apt_repo.yml
+
+- name: Install rinetd from GitHub Releases
+  when: rinetd_install_source == 'github_releases'
+  include_tasks: install_from_github_releases.yml

@@ -1,0 +1,18 @@
+galaxy_info:
+  author: kevinpoitra
+  role_name: rinetd
+  description: Sets up and configures rinetd to redirect network traffic
+  license: BSD-3-Clause
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: Debian
+      versions:
+        - all
+
+  galaxy_tags:
+    - rinetd
+    - networking
+    - redirect
+
+  dependencies: []

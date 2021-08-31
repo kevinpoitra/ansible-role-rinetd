@@ -1,0 +1,6 @@
+---
+- name: Install rinetd from apt repository
+  ansible.builtin.apt:
+    name: rinetd
+    state: present
+    update_cache: true
